@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trắc nghiệm Từ vựng Tiếng Hàn: Lịch sử, Văn hóa & Xã hội</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .quiz-container {
+            background: #fff;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 650px;
+        }
+        h2 { text-align: center; color: #2c3e50; margin-bottom: 15px; }
+        .progress-container {
+            width: 100%;
+            background-color: #e0e0e0;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            height: 12px;
+            overflow: hidden;
+        }
+        .progress-bar {
+            height: 12px;
+            background-color: #e67e22;
+            border-radius: 8px;
+            width: 0%;
+            transition: width 0.4s ease;
+        }
+        .status-text { text-align: center; font-weight: bold; color: #7f8c8d; margin-bottom: 20px; font-size: 0.9em;}
+        .question { font-size: 1.2em; font-weight: bold; margin-bottom: 20px; line-height: 1.5; color: #34495e;}
+        .choices { display: flex; flex-direction: column; gap: 12px; }
+        .choice-btn {
+            background: #fff;
+            border: 2px solid #bdc3c7;
+            padding: 14px 18px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.05em;
+            text-align: left;
+            transition: all 0.2s;
+            color: #2c3e50;
+        }
+        .choice-btn:hover { background: #f8f9fa; border-color: #95a5a6; }
+        .choice-btn:disabled { cursor: not-allowed; opacity: 0.9; }
+        .explanation {
+            margin-top: 20px;
+            padding: 15px;
+            background: #fff3e0;
+            border-left: 5px solid #e67e22;
+            display: none;
+            font-size: 0.95em;
+            line-height: 1.6;
+            border-radius: 5px;
+            color: #d35400;
+        }
+        .btn-next {
+            margin-top: 20px;
+            background: #e67e22;
+            color: white;
+            border: none;
+            padding: 14px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 1.1em;
+            display: none;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+        .btn-next:hover { background: #d35400; }
+        .correct { background: #27ae60 !important; color: white !important; border-color: #2ecc71 !important; }
+        .wrong { background: #c0392b !important; color: white !important; border-color: #e74c3c !important; }
+        .result-screen { text-align: center; display: none; }
+        .result-screen h3 { color: #e67e22; font-size: 2em; margin-bottom: 15px; }
+        .score-text { font-size: 1.3em; font-weight: bold; margin-bottom: 20px; color: #34495e;}
+    </style>
+</head>
+<body>
+
+<div class="quiz-container">
+    <div id="quiz-ui">
+        <h2>Văn hóa, Lịch sử & Idiom 🇰🇷</h2>
+        <div class="progress-container"><div class="progress-bar" id="progress-bar"></div></div>
+        <div class="status-text" id="status-text">Câu 1 / 50</div>
+        <div class="question" id="question">Đang tải câu hỏi...</div>
+        <div class="choices" id="choices"></div>
+        <div class="explanation" id="explanation"></div>
+        <button class="btn-next" id="next-btn" onclick="nextQuestion()">Câu tiếp theo</button>
+    </div>
+    
+    <div class="result-screen" id="result-screen">
+        <h3>🎉 Tuyệt vời!</h3>
+        <div class="score-text" id="score-text"></div>
+        <p>Bạn đã hoàn thành bộ 50 từ vựng và biểu hiện nâng cao. Chúc mừng bạn đã nâng cấp vốn tiếng Hàn của mình!</p>
+        <button class="btn-next" style="display:block; margin-top:25px; background-color: #27ae60;" onclick="location.reload()">Học lại từ đầu</button>
+    </div>
+</div>
+
+<script>
+    const quizData = [
+        // Nhóm 1: Thành ngữ & Cụm từ biểu hiện
+        { q: "Cụm từ '원래 같으면' mang ý nghĩa gì?", c: ["Nếu như bình thường", "Thời điểm ban đầu", "Khá là giống nhau", "Đương thời"], a: 0, e: "<b>원래 같으면</b>: Nếu như bình thường / Lẽ ra bình thường thì." },
+        { q: "Tình trạng 'Không có thời gian rảnh / Không được thư thái' gọi là gì?", c: ["무조건", "제대로", "여유가 없다", "어쨌든"], a: 2, e: "<b>여유가 없다</b>: Không có sự dư dả (về thời gian, tâm lý, tiền bạc)." },
+        { q: "Cụm từ '느낌이 확 나다' dùng để diễn tả điều gì?", c: ["Cảm giác biến mất", "Toát lên cảm giác rõ rệt", "Nhận thức sâu sắc", "Cú sốc lớn"], a: 1, e: "<b>느낌이 확 나다</b>: Toát lên cảm giác rõ ràng, đậm nét (ví dụ: cảm giác không khí Giáng sinh)." },
+        { q: "Thành ngữ '발 디딜 틈이 없다' mang nghĩa là gì?", c: ["Không có chỗ chen chân", "Loại bỏ hoàn toàn", "Đi loanh quanh", "Vô điều kiện"], a: 0, e: "<b>발 디딜 틈이 없다</b>: Đông đúc đến mức không có chỗ đặt chân (chen chân)." },
+        { q: "Cụm từ '마음에 안 들다' có nghĩa là?", c: ["Trở nên mạnh mẽ", "Không vừa ý / Không thích", "Bị bắt đi", "Cảm thấy gánh nặng"], a: 1, e: "<b>마음에 안 들다</b>: Không lọt vào mắt, không vừa ý." },
+        { q: "Trạng từ '어쩌면' mang ý nghĩa gì?", c: ["Tuyệt đối", "Dù sao đi nữa", "Có lẽ / Biết đâu", "Cho đến tận lúc đó"], a: 2, e: "<b>어쩌면</b>: Có lẽ, biết đâu chừng (thường đi với đuôi câu dự đoán)." },
+        { q: "Cụm '제대로' được hiểu là gì?", c: ["Một cách khủng khiếp", "Một cách lạ lùng", "Một cách bài bản / Đúng nghĩa", "Khắp nơi"], a: 2, e: "<b>제대로</b>: Tử tế, đàng hoàng, bài bản, đúng nghĩa." },
+        { q: "Từ '특히나' có nghĩa là gì?", c: ["Đặc biệt là", "Hào hứng", "Phần lớn", "Khá là"], a: 0, e: "<b>특히나</b>: Đặc biệt là (nhấn mạnh của 특히)." },
+
+        // Nhóm 2: Lịch sử & Chính trị
+        { q: "Cụm từ '지배를 받다' trong bối cảnh lịch sử nghĩa là gì?", c: ["Giành được tự do", "Chịu sự thống trị / Cai trị", "Bị tước đoạt", "Tự mình đứng vững"], a: 1, e: "<b>지배를 받다</b>: Bị chi phối, chịu sự thống trị của thế lực khác." },
+        { q: "Danh từ '해방' mang ý nghĩa gì?", c: ["Tư lệnh", "Chính phủ", "Giải phóng", "Sự nghiêm cấm"], a: 2, e: "<b>해방</b>: Giải phóng (ví dụ: Hàn Quốc được giải phóng khỏi ách đô hộ năm 1945)." },
+        { q: "Hành động '자유를 얻다' nghĩa là gì?", c: ["Giành được tự do", "Đổ xô ra", "Truyền bá tự do", "Xóa bỏ giới nghiêm"], a: 0, e: "<b>자유를 얻다</b>: Có được/giành được tự do." },
+        { q: "Từ '당시' dùng để chỉ mốc thời gian nào?", c: ["Quá khứ", "Thời đại", "Đương thời / Lúc đó", "Ngày nay"], a: 2, e: "<b>당시</b>: Đương thời, vào thời điểm đó." },
+        { q: "Chức danh '사령관' trong quân đội là gì?", c: ["Tổng thống", "Giáo sĩ", "Tư lệnh / Người chỉ huy", "Tín đồ"], a: 2, e: "<b>사령관</b>: Tư lệnh, người chỉ huy quân sự cao cấp." },
+        { q: "Danh từ '통금시간 (통행금지)' chỉ điều gì trong quá khứ?", c: ["Lễ hội truyền thống", "Giờ giới nghiêm", "Thời gian làm việc", "Buổi biểu diễn"], a: 1, e: "<b>통금시간</b>: Giờ giới nghiêm (cấm ra đường vào ban đêm)." },
+        { q: "Động từ '잡혀가다' có nghĩa là gì?", c: ["Tiếp nối", "Tự lập", "Bị bắt đi", "Van nài"], a: 2, e: "<b>잡혀가다</b>: Bị (ai đó/cảnh sát) bắt dẫn đi." },
+
+        // Nhóm 3: Tôn giáo & Xã hội
+        { q: "Từ '기독교 신자' chỉ đối tượng nào?", c: ["Tín đồ Phật giáo", "Tín đồ Cơ đốc giáo", "Người vô thần", "Giáo sĩ truyền giáo"], a: 1, e: "<b>기독교 신자</b>: Tín đồ đạo Cơ đốc (Tin Lành)." },
+        { q: "Tính từ '독실하다' thường dùng để miêu tả người như thế nào?", c: ["Sùng đạo", "Tử tế", "Quyền lực", "Sang trọng"], a: 0, e: "<b>독실하다</b>: Sùng đạo, có đức tin sâu sắc." },
+        { q: "Từ '선교사' nghĩa là gì?", c: ["Chính phủ", "Tư lệnh", "Giáo sĩ truyền giáo", "Người yêu"], a: 2, e: "<b>선교사</b>: Nhà truyền giáo (Missionary)." },
+        { q: "Cụm '종교를 전하다' có nghĩa là gì?", c: ["Truyền bá tôn giáo", "Phản đối tôn giáo", "Tin vào tôn giáo", "Sùng đạo"], a: 0, e: "<b>종교를 전하다</b>: Truyền đạo, truyền bá tôn giáo." },
+        { q: "Danh từ '십자가' là biểu tượng của điều gì?", c: ["Búp bê", "Đồ trang trí", "Thập tự giá", "Lá cờ"], a: 2, e: "<b>십자가</b>: Cây thánh giá, thập tự giá." },
+        { q: "Động từ '뺏다 / 빼앗다' mang nghĩa gì?", c: ["Phân phát", "Cướp đoạt / Tước đoạt", "Chia sẻ", "Loại bỏ"], a: 1, e: "<b>빼앗다</b>: Cướp đoạt, lấy đi một cách cưỡng ép." },
+        { q: "Nơi gọi là '어학당' thực chất là gì?", c: ["Trường đại học", "Học viện ngôn ngữ", "Chính phủ", "Cửa hàng bách hóa"], a: 1, e: "<b>어학당</b>: Viện ngôn ngữ (thường trực thuộc đại học để dạy tiếng cho người nước ngoài)." },
+        { q: "Danh từ '밀가루' là nguyên liệu gì?", c: ["Gạo", "Đường", "Bột mì", "Dầu ăn"], a: 2, e: "<b>밀가루</b>: Bột mì (Thường được viện trợ sau chiến tranh)." },
+
+        // Nhóm 4: Tính từ, Trạng từ & Biểu hiện trừu tượng
+        { q: "Từ '여태까지' có nghĩa là gì?", c: ["Từ nay về sau", "Cho đến tận lúc đó / Cho đến nay", "Một cách sâu sắc", "Tuyệt đối"], a: 1, e: "<b>여태까지</b>: Cho đến tận lúc này, cho tới bây giờ." },
+        { q: "Trạng từ '엄청나게' diễn tả mức độ như thế nào?", c: ["Một cách tự nhiên", "Riêng tư", "Một cách khủng khiếp / Cực kỳ", "Lấp lánh"], a: 2, e: "<b>엄청나게</b>: Cực kỳ, vô cùng, khủng khiếp." },
+        { q: "Từ '무조건' mang ý nghĩa gì?", c: ["Một cách đúng nghĩa", "Vô điều kiện / Tuyệt đối", "Chỉ một chút", "Khá là"], a: 1, e: "<b>무조건</b>: Không có điều kiện, tuyệt đối phải làm." },
+        { q: "Từ '어쨌든' dùng trong câu với ý nghĩa gì?", c: ["Đương nhiên", "Dù sao đi nữa", "Đặc biệt là", "Có lẽ"], a: 1, e: "<b>어쨌든</b>: Dù sao thì, bằng cách nào đó." },
+        { q: "Từ '여전히' có nghĩa là gì?", c: ["Đột ngột", "Thay đổi", "Vẫn / Vẫn như cũ", "Dù sao"], a: 2, e: "<b>여전히</b>: Vẫn thế, không có gì thay đổi." },
+        { q: "Trạng từ '오붓하게' miêu tả không khí như thế nào?", c: ["Ồn ào náo nhiệt", "Một cách ấm cúng / Riêng tư", "Đông đúc", "Khủng khiếp"], a: 1, e: "<b>오붓하게</b>: Đầm ấm, yên tĩnh, riêng tư (thường dành cho cặp đôi/gia đình)." },
+        { q: "Từ '고급스럽다' diễn tả cảm giác gì?", c: ["Lấp lánh", "Sang trọng / Cao cấp", "Thân thiện", "Áp lực"], a: 1, e: "<b>고급스럽다</b>: Trông sang trọng, có vẻ cao cấp." },
+        { q: "Cảm giác '부담스럽다' là như thế nào?", c: ["Phấn khích", "Tiếc nuối", "Cảm thấy áp lực / Gánh nặng", "Hào hứng"], a: 2, e: "<b>부담스럽다</b>: Cảm thấy gánh nặng, áp lực, ái ngại." },
+        { q: "Từ '상업적' có nghĩa là gì?", c: ["Toàn cầu", "Bầu không khí", "Mang tính thương mại", "Truyền thống"], a: 2, e: "<b>상업적</b>: Mang tính thương mại, kinh doanh." },
+        { q: "Tính từ '전 세계적' mang ý nghĩa gì?", c: ["Khu vực", "Mang tính toàn cầu", "Văn hóa phương Đông", "Quá khứ"], a: 1, e: "<b>전 세계적</b>: Quy mô toàn cầu, trên toàn thế giới." },
+
+        // Nhóm 5: Động từ phức tạp & Danh từ khác
+        { q: "'호두까기 인형' là tên của vật gì?", c: ["Đồ trang trí cây thông", "Búp bê kẹp hạt dẻ", "Ngọn nến", "Ông già Noel"], a: 1, e: "<b>호두까기 인형</b>: Búp bê kẹp hạt dẻ (The Nutcracker)." },
+        { q: "Từ '공휴일' chỉ ngày gì?", c: ["Ngày cuối tuần", "Ngày nghỉ lễ chính thức", "Ngày sinh nhật", "Ngày kỷ niệm"], a: 1, e: "<b>공휴일</b>: Ngày nghỉ lễ theo luật định (Public holiday)." },
+        { q: "Hành động '예매하다' nghĩa là gì?", c: ["Xóa bỏ", "Hóa trang", "Lập kế hoạch", "Đặt vé trước"], a: 3, e: "<b>예매하다</b>: Đặt mua vé trước (cho buổi biểu diễn, phim, tàu xe)." },
+        { q: "Danh từ '잔소리' nghĩa là gì?", c: ["Lời cằn nhằn / Giáo huấn", "Lời an ủi", "Cú sốc", "Trách nhiệm"], a: 0, e: "<b>잔소리</b>: Lời cằn nhằn, càu nhàu, dạy đời." },
+        { q: "Từ '위로' mang ý nghĩa gì?", c: ["Nhận thức", "Sự an ủi / Động viên", "Cú sốc", "Trách nhiệm"], a: 1, e: "<b>위로</b>: Lời an ủi, sự động viên." },
+        { q: "Từ '인식' có nghĩa là gì?", c: ["Nhận thức / Quan niệm", "Giải phóng", "Trách nhiệm", "Sự nghiêm cấm"], a: 0, e: "<b>인식</b>: Nhận thức, sự hiểu biết về một vấn đề." },
+        { q: "Danh từ '자체' nghĩa là gì?", c: ["Đất đai", "Trách nhiệm", "Tự thân / Chính nó", "Hình ảnh"], a: 2, e: "<b>자체</b>: Bản thân nó, tự thân sự việc đó." },
+        { q: "Từ '충격' có nghĩa là gì?", c: ["Giải phóng", "Cú sốc / Chấn động", "Sự nghiêm cấm", "Nhận thức"], a: 1, e: "<b>충격</b>: Cú sốc (về tinh thần hoặc vật lý)." },
+        { q: "Động từ '이어지다' nghĩa là gì?", c: ["Ngăn cấm", "Tiếp nối / Kéo dài", "Xóa bỏ", "Phân phát"], a: 1, e: "<b>이어지다</b>: Tiếp nối, nối liền, tiếp tục diễn ra." },
+        { q: "Động từ '건너오다' trong câu chuyện lịch sử nghĩa là?", c: ["Giúp đỡ", "Tự lập", "Xây dựng", "Băng qua (biển/địa hình) để đến"], a: 3, e: "<b>건너오다</b>: Vượt qua (biển, biên giới) để đi sang một nơi khác." },
+        { q: "Hành động '일어서다' mang nghĩa bóng là gì?", c: ["Tự lập / Đứng vững", "Bị bắt đi", "Đổ xô ra", "Đi loanh quanh"], a: 0, e: "<b>일어서다</b>: Nghĩa đen là đứng dậy, nghĩa bóng là tự lập, gượng dậy sau khó khăn." },
+        { q: "Động từ '없애다' có nghĩa là gì?", c: ["Hóa trang", "Tô điểm", "Lập kế hoạch", "Loại bỏ / Xóa bỏ"], a: 3, e: "<b>없애다</b>: Xóa bỏ, làm cho biến mất." },
+        { q: "Hành động '분장하다' thường làm vào dịp Halloween nghĩa là gì?", c: ["Hóa trang", "Trang trí", "Cầu xin", "Đi loanh quanh"], a: 0, e: "<b>분장하다</b>: Hóa trang thành nhân vật khác." },
+        { q: "Từ '쏟아져 나오다' diễn tả hành động gì?", c: ["Giành được tự do", "Đổ xô ra / Tràn ra", "Toát lên cảm giác", "Chịu sự thống trị"], a: 1, e: "<b>쏟아져 나오다</b>: Tràn ra, ùa ra (như nước đổ ra, ý chỉ đám đông)." },
+        { q: "Hành động '빌다' có nghĩa là gì?", c: ["Van nài / Cầu xin", "Quản lý", "Giúp đỡ", "Phân phát"], a: 0, e: "<b>빌다</b>: Cầu xin, van xin (hoặc cầu nguyện)." },
+        { q: "Từ '동양 문화' nghĩa là gì?", c: ["Văn hóa phương Tây", "Văn hóa truyền thống", "Văn hóa phương Đông", "Văn hóa toàn cầu"], a: 2, e: "<b>동양 문화</b>: Văn hóa phương Đông." },
+        { q: "Danh từ '야경' chỉ khung cảnh gì?", c: ["Cảnh biển", "Cảnh đêm", "Cảnh núi non", "Khắp nơi"], a: 1, e: "<b>야경</b>: Dạ cảnh, cảnh ban đêm." }
+    ];
+
+    let currentQuestionIndex = 0;
+    let score = 0;
+    const questionEl = document.getElementById("question");
+    const choicesEl = document.getElementById("choices");
+    const explanationEl = document.getElementById("explanation");
+    const nextBtn = document.getElementById("next-btn");
+    const progressBar = document.getElementById("progress-bar");
+    const statusText = document.getElementById("status-text");
+    const quizUi = document.getElementById("quiz-ui");
+    const resultScreen = document.getElementById("result-screen");
+    const scoreText = document.getElementById("score-text");
+
+    function loadQuestion() {
+        explanationEl.style.display = "none";
+        nextBtn.style.display = "none";
+        choicesEl.innerHTML = "";
+        
+        statusText.innerText = `Câu ${currentQuestionIndex + 1} / ${quizData.length}`;
+        progressBar.style.width = `${((currentQuestionIndex) / quizData.length) * 100}%`;
+        
+        const currentQuiz = quizData[currentQuestionIndex];
+        questionEl.innerText = `${currentQuestionIndex + 1}. ${currentQuiz.q}`;
+
+        currentQuiz.c.forEach((choice, index) => {
+            const button = document.createElement("button");
+            button.innerText = choice;
+            button.classList.add("choice-btn");
+            button.onclick = () => selectAnswer(index, button);
+            choicesEl.appendChild(button);
+        });
+    }
+
+    function selectAnswer(selectedIndex, button) {
+        const currentQuiz = quizData[currentQuestionIndex];
+        const allButtons = choicesEl.children;
+
+        for (let i = 0; i < allButtons.length; i++) {
+            allButtons[i].disabled = true;
+            if (i === currentQuiz.a) {
+                allButtons[i].classList.add("correct");
+            }
+        }
+
+        if (selectedIndex !== currentQuiz.a) {
+            button.classList.add("wrong");
+        } else {
+            score++;
+        }
+
+        explanationEl.innerHTML = currentQuiz.e;
+        explanationEl.style.display = "block";
+        nextBtn.style.display = "block";
+
+        if (currentQuestionIndex === quizData.length - 1) {
+            nextBtn.innerText = "Xem kết quả chung cuộc";
+            progressBar.style.width = "100%";
+        } else {
+            nextBtn.innerText = "Chuyển sang câu tiếp theo";
+        }
+    }
+
+    function nextQuestion() {
+        currentQuestionIndex++;
+        if (currentQuestionIndex < quizData.length) {
+            loadQuestion();
+        } else {
+            showResult();
+        }
+    }
+    
+    function showResult() {
+        quizUi.style.display = "none";
+        resultScreen.style.display = "block";
+        scoreText.innerText = `Bạn đã chinh phục đúng: ${score} / ${quizData.length} từ khó!`;
+    }
+
+    // Khởi tạo ngay khi load
+    loadQuestion();
+</script>
+
+</body>
+</html>
